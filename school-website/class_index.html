@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>School App - Class Filter</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="logo3.png" type="image/png" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 20px;
+    }
+
+    #menu {
+      margin-bottom: 20px;
+    }
+
+    #menu button {
+      margin-right: 10px;
+      padding: 10px;
+      border: none;
+      background-color: #00b894;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #addStudentForm input, select {
+      padding: 8px;
+      margin: 5px;
+    }
+
+    #classButtons button {
+      margin: 5px;
+      padding: 10px 15px;
+      background-color: #0984e3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #studentsInClass {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      max-width: 600px;
+    }
+
+    .student-actions button {
+      margin-left: 5px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+    <nav style="background-color: #00b894; padding: 10px; color: white; display: flex; justify-content: space-between; align-items: center;">
+    <span style="font-weight: bold; font-size: 18px;">🏫 ST ANDREW'S ACADEMY</span>
+      <div>
+        <button onclick="showMenu()" style="background: transparent; color: white; border: none; font-size: 16px; cursor: pointer;">☰ Menu</button>
+        <div id="menuDropdown" style="display: none; background: white; color: black; position: absolute; right: 10px; top: 50px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 6px; z-index: 1000;">
+            <button onclick="changeUsername()" style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">✏️ Change Username</button>
+            <button onclick="changePassword()" style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">🔐 Change Password</button>
+            <button onclick="clearData()" style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">🧹 Reset Data</button>
+            <button onclick="logout()" style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">🚪 Logout</button>
+        </div>
+      </div>
+  </nav>
+  <header>
+    <img src="logo3.png" alt="School Logo" style="height: 50px;" />
+    <h1>🏫 ST ANDREW'S ACADEMY</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+  <h1>                                                   </h1>
+
+  <div id="menu">
+    <button onclick="showSection('add')">Add Student</button>
+    <button onclick="showSection('class')">View by Class</button>
+    <a href="index.html" class="nav-button" style="margin-top: 20px;">⬅️ Back to Students</a>
+  </div>
+
+  <!-- Add Student Section -->
+  <div id="addSection">
+    <h2>Add Student</h2>
+    <form id="addStudentForm">
+      <input type="text" id="studentName" placeholder="Student Name" required />
+      <select id="studentClass">
+        <option value="">Select Class</option>
+        <option>Primary 1</option>
+        <option>Primary 2</option>
+        <option>Primary 3</option>
+        <option>Primary 4</option>
+        <option>Primary 5</option>
+        <option>Primary 6</option>
+        <option>JSS 1</option>
+        <option>JSS 2</option>
+        <option>JSS 3</option>
+        <option>SSS 1</option>
+        <option>SSS 2</option>
+        <option>SSS 3</option>
+      </select>
+      <button type="submit">Add</button>
+    </form>
+  </div>
+
+  <!-- Class Section -->
+  <div id="classSection" style="display:none">
+    <h2>Select a Class</h2>
+    <input type="text" id="searchInput" placeholder="Search name..." oninput="searchStudent()" style="padding: 8px; margin-bottom: 10px; width: 300px;" />
+    <div id="classButtons"></div>
+    <div id="studentsInClass" style="display:none">
+      <h3 id="classTitle"></h3>
+      <ul id="studentList"></ul>
+    </div>
+  </div>
+
+  <script>
+    const classes = [
+      "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5", "Primary 6",
+      "JSS 1", "JSS 2", "JSS 3",
+      "SSS 1", "SSS 2", "SSS 3"
+    ];
+
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+
+    function showSection(section) {
+      document.getElementById("addSection").style.display = section === 'add' ? 'block' : 'none';
+      document.getElementById("classSection").style.display = section === 'class' ? 'block' : 'none';
+      if (section === 'class') loadClassButtons();
+    }
+
+    document.getElementById("addStudentForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = document.getElementById("studentName").value.trim();
+      const studentClass = document.getElementById("studentClass").value;
+      if (!name || !studentClass) return alert("Please fill all fields.");
+
+      students.push({ name, class: studentClass });
+      localStorage.setItem("students", JSON.stringify(students));
+      alert("Student added!");
+      this.reset();
+    });
+
+    function loadClassButtons() {
+      const container = document.getElementById("classButtons");
+      container.innerHTML = "";
+
+      classes.forEach(className => {
+        const count = students.filter(s => s.class === className).length;
+        const btn = document.createElement("button");
+        btn.textContent = `${className} (${count})`;
+        btn.onclick = () => showStudentsInClass(className);
+        container.appendChild(btn);
+      });
+    }
+
+    function showStudentsInClass(className) {
+      document.getElementById("classTitle").textContent = `Students in ${className}`;
+      const list = document.getElementById("studentList");
+      list.innerHTML = "";
+
+      const filtered = students.filter(s => s.class === className);
+      if (filtered.length === 0) {
+        list.innerHTML = "<li>No students in this class.</li>";
+      } else {
+        filtered.forEach((s, index) => {
+          const li = document.createElement("li");
+          li.innerHTML = `${s.name} <div class="student-actions">
+            <button onclick="viewResult('${s.name}')">📄 View Result</button>
+            <button onclick="editStudent('${className}', ${index})">✏️ Edit</button>
+            <button onclick="deleteStudent('${className}', ${index})">🗑️ Delete</button>
+          </div>`;
+          list.appendChild(li);
+        });
+      }
+
+      document.getElementById("studentsInClass").style.display = "block";
+    }
+
+    function searchStudent() {
+      const term = document.getElementById("searchInput").value.toLowerCase();
+      const allStudents = students.filter(s => s.name.toLowerCase().includes(term));
+      const list = document.getElementById("studentList");
+      list.innerHTML = "";
+
+      if (allStudents.length === 0) {
+        list.innerHTML = "<li>No students found.</li>";
+      } else {
+        document.getElementById("classTitle").textContent = "Search Results:";
+        allStudents.forEach((s, index) => {
+          const li = document.createElement("li");
+          li.innerHTML = `${s.name} (${s.class}) <div class="student-actions">
+            <button onclick="viewResult('${s.name}')">📄 View Result</button>
+            <button onclick="editStudent('${s.class}', ${index})">✏️ Edit</button>
+            <button onclick="deleteStudent('${s.class}', ${index})">🗑️ Delete</button>
+          </div>`;
+          list.appendChild(li);
+        });
+      }
+
+      document.getElementById("studentsInClass").style.display = "block";
+    }
+
+    function editStudent(className, index) {
+      const filtered = students.filter(s => s.class === className);
+      const student = filtered[index];
+      const newName = prompt("Edit name:", student.name);
+      if (newName) {
+        const realIndex = students.findIndex(s => s.name === student.name && s.class === student.class);
+        students[realIndex].name = newName;
+        localStorage.setItem("students", JSON.stringify(students));
+        showStudentsInClass(className);
+      }
+    }
+
+    function deleteStudent(className, index) {
+      const filtered = students.filter(s => s.class === className);
+      const student = filtered[index];
+      if (confirm(`Delete ${student.name}?`)) {
+        const realIndex = students.findIndex(s => s.name === student.name && s.class === student.class);
+        students.splice(realIndex, 1);
+        localStorage.setItem("students", JSON.stringify(students));
+        showStudentsInClass(className);
+      }
+    }
+
+    function viewResult(studentName) {
+      alert("Showing result for: " + studentName + "\n(Note: You can integrate real result data here.)");
+    }
+  </script>
+</body>
+</html>
