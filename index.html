@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="logo3.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🏫 ST ANDREW'S ACADEMY</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <nav style="background-color: #00b894; padding: 10px; color: white; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: bold; font-size: 18px;">🏫 ST ANDREW'S ACADEMY</span>
+        <div>
+            <button onclick="showMenu()" style="background: transparent; color: white; border: none; font-size: 16px; cursor: pointer;">☰ Menu</button>
+            <div id="menuDropdown" style="display: none; background: white; color: black; position: absolute; right: 10px; top: 50px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 6px; z-index: 1000;">
+                <button onclick="changeUsername()" style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">✏️ Change Username</button>
+                <button onclick="changePassword()" style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">🔐 Change Password</button>
+                <button onclick="clearData()" style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">🧹 Reset Data</button>
+                <button onclick="logout()" style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">🚪 Logout</button>
+                <button onclick="showSection('add')"style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">Add Student</button>
+                <button onclick="showSection('class')"style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">View by Class</button>
+                <button onclick="showSection('print')"style="display:block; padding: 10px; width: 180px; border: none; background: white; text-align: left; cursor: pointer;">🖨️ Print Results</button>
+            </div>
+      </div>
+    </nav>
+
+  <header>
+    <img src="logo3.png" alt="School Logo" style="height: 50px;" />
+    <h1>🏫 ST ANDREW'S ACADEMY</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+
+    <main>
+        <button id="studentsBtn" class="nav-button">📚 Students</button>
+        <button id="uploadResultBtn" class="nav-button">⬆️ Upload Result</button>
+        <button id="suspendedBtn" class="nav-button">🚫 Suspended Students</button>
+        <button id="staffParentBtn" class="nav-button">👨‍🏫 Staff & 👪 Parents</button>
+        <a href="school_class_filtering2.html" class="nav-button" style="margin-top: 20px;">🏫 Class</a>
+        <!-- Student Page Section (initially hidden) -->
+        
+        <div id="studentPage" style="display: none;">
+            <section>
+                <h2>📋 Student Records</h2>
+
+                <!-- Add Student Form -->
+                <form id="student-form">
+                    <input type="text" id="name" placeholder="Student Name" required />
+                    <input type="text" id="class" placeholder="Class" required />
+                    <input type="text" id="result" placeholder="result persentage"  />
+                    <input type="text" id="age" placeholder="Age (Age)"  />
+                    <button type="submit">➕ Add Student</button>
+                </form>
+
+                <!-- Student Table -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Class</th>
+                            <th>Result</th>
+                            <th>Age</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-table"></tbody>
+                </table>
+                <div id="uploadResultSection" style="display:none; margin-top:20px;">
+                    <h2>⬆️ Upload Student Result</h2>
+                    <form id="uploadResultForm">
+                        <input type="text" id="uploadStudentName" placeholder="Student Name" required />
+                        <input type="text" id="uploadStudentClass" placeholder="Class" required />
+                        <input type="text" id="uploadStudentAge" placeholder="Age" required />
+                        <button type="button" onclick="closeModal()">Done</button>
+
+
+                        <table id="uploadResultTable" border="1" style="width:100%; margin-top:10px;">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Test1</th>
+                                    <th>Exam</th>
+                                    <th>Homework</th>
+                                    <th>Classwork</th>
+                                    <th>Remove</th>
+                               </tr>
+                            </thead>
+                            <tbody id="uploadResultBody">
+                                <!-- Rows added dynamically -->
+                            </tbody>
+                        </table>
+                        <button type="button" id="addSubjectRowBtn" style="margin-top:10px;">➕ Add Subject</button>
+                            <br/>
+                        <button type="submit" style="margin-top:10px;">Upload Result</button>
+                    </form>
+                </div>
+            </section>
+        </div>
+        <div id="suspendedPage" style="display:none;">
+            <h2>🚫 Suspended Students</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Result</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="suspended-table"></tbody>
+            </table>
+        </div>
+        <div id="staffParentPage" style="display: none;">
+            <h2>👨‍🏫 Staff List</h2>
+            <ul id="staffList">
+                <table border="1" style="width: 100%;" id="staffTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffList"></tbody>
+                </table>
+                <button id="saveStaffBtn" style="margin-top: 10px;">💾 Save Staff</button>
+            </ul>
+            <form id="staffForm" style="margin-top: 10px;">
+                <input type="text" id="newStaffName" placeholder="Staff Name" required />
+                <input type="text" id="newStaffPosition" placeholder="Position" required />
+                <button type="submit">➕ Add Staff</button>
+            </form>
+            <thead>
+                <tr>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+
+            <label style="margin-top: 20px; display: block;"> 
+                <input type="checkbox" id="toggleParents" />
+               Show Parents
+            </label>
+
+            <div id="parentSection" style="display: none; margin-top: 10px;">
+                <h2>👪 Parent Information</h2>
+
+                <form id="parentForm" style="margin-bottom: 10px;">
+                    <input type="text" id="newParentName" placeholder="Parent Name" required />
+                    <input type="text" id="newParentPhone" placeholder="Phone" required />
+                    <input type="email" id="newParentEmail" placeholder="Email" required />
+                    <input type="text" id="newParentChild" placeholder="Child Name" required />
+                    <button type="submit">➕ Add Parent</button>
+                </form>
+
+                <table border="1" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Parent Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Child</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parentTable"></tbody>
+                </table>
+            </div>  
+        </div>
+        <div id="homePage" style="display: none; padding: 20px;">
+            <h2>Welcome, <span id="welcomeUser"></span>!</h2>
+            <p>Here’s a quick summary:</p>
+            <ul>
+                <li>Total Students: <span id="totalStudents">0</span></li>
+                <li>Suspended Students: <span id="totalSuspended">0</span></li>
+            </ul>
+
+            <div style="margin-top: 20px;">
+                <button id="goStudents">📚 Students</button>
+                <button id="goUploadResults">⬆️ Upload Results</button>
+                <button id="goStaffParents">👨‍🏫 Staff & Parents</button>
+                <button onclick="logout()">🚪 Logout</button>
+        </div>
+        <div id="classPage" style="display: none; padding: 20px;">
+            <h2>Select a Class</h2>
+            <div id="classButtons" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;"></div>
+
+            <div id="classStudentList" style="margin-top: 20px;">
+                <h3 id="classTitle"></h3>
+                <ul id="studentsInClass"></ul>
+            </div>
+        </div>
+        <div id="printSection" style="display:none">
+            <h2>Print Student Result</h2>
+            <input type="text" id="printSearch" placeholder="Enter student name..." style="padding: 8px; width: 300px;">
+            <select id="termSelect" style="padding: 8px; margin-left: 10px;">
+                <option value="Term 1">Term 1</option>
+                <option value="Term 2">Term 2</option>
+                <option value="Term 3">Term 3</option>
+            </select>
+            <button onclick="printStudentResult()">Print Result</button>
+        </div>       
+    </main>
+
+  <footer>
+    <p>&copy; 2025 ST ANDREW'S ACADEMY</p>
+  </footer>
+
+  <script src="script.js">
+    let students = JSON.parse(localStorage.getItem("students")) || [
+    {
+        name: "John Doe",
+        class: "SS2",
+        result: "85%",
+        subjects: [
+          { subject: "Math", test: 15, exam: 60, homework: 10, classwork: 15 },
+          { subject: "English", test: 14, exam: 55, homework: 9, classwork: 13 }
+        ]
+      }
+    ];
+  </script>
+</body>
+</html>
