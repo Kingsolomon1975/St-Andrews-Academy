@@ -216,5 +216,28 @@
       }
     ];
   </script>
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAUT2RJ-8-5uk_K6xJZ_r2GAclm6liCe9U",
+  authDomain: "school-portal-92a23.firebaseapp.com",
+  projectId: "school-portal-92a23",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function loadStudents(){
+  const querySnapshot = await getDocs(collection(db, "students"));
+  querySnapshot.forEach((doc) => {
+    console.log(doc.data());
+  });
+}
+
+loadStudents();
+</script>
 </body>
 </html>
+
