@@ -275,7 +275,7 @@ suspendedBtn.addEventListener("click", () => {
   uploadResultSection.style.display = "none";
   displaySuspended(); // Make sure suspended list is refreshed/shown
 });
-const staffList = [
+let staffList = JSON.parse(localStorage.getItem("staffList")) || [
   { name: "Mrs. Johnson", position: "Principal" },
   { name: "Mr. Ade", position: "Math Teacher" },
   { name: "Ms. Chika", position: "Counselor" },
@@ -350,7 +350,8 @@ function editStaff(index, field, value) {
   staffList[index][field] = value;
 }
 function saveStaff() {
-  localStorage.setItem("Staff", JSON.stringify(staffList));
+  localStorage.setItem("staffList", JSON.stringify(staffList));
+  displayStaff();
   alert("✅ Staff info saved!");
 }
 document.getElementById("saveStaffBtn").addEventListener("click", () => {
@@ -360,17 +361,23 @@ document.getElementById("saveStaffBtn").addEventListener("click", () => {
 
 
 // === ADD STAFF ===
-document.getElementById("staffForm").addEventListener("submit", function (e) {
+ddocument.getElementById("staffForm").addEventListener("submit", function (e) {
+
   e.preventDefault();
+
   const name = document.getElementById("newStaffName").value.trim();
   const position = document.getElementById("newStaffPosition").value.trim();
 
-  if (name && position) {
-    staffList.push({ name, position });
-    localStorage.setItem("staffList", JSON.stringify(staffList));
-    displayStaff();
-    this.reset();
-  }
+  if (!name || !position) return;
+
+  staffList.push({ name, position });
+
+  saveStaff();
+
+  displayStaff();
+
+  this.reset();
+
 });
 
 // === ADD PARENT ===
@@ -565,3 +572,4 @@ function printStudentResult() {
   printWindow.document.close();
   printWindow.print();
 }
+displayStaff();
