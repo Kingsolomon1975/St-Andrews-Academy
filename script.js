@@ -10,41 +10,58 @@ let suspendedStudents = JSON.parse(localStorage.getItem("suspendedStudents")) ||
 // Load from localStorage or use default students
 let students = JSON.parse(localStorage.getItem("students")) || [
   {
+    id: 1001,
     name: "John Doe",
     class: "SS2",
     result: "85%",
+    age: 16,
     subjects: [
       { subject: "Math", test: 15, exam: 60, homework: 10, classwork: 15 },
       { subject: "English", test: 14, exam: 55, homework: 9, classwork: 13 }
     ]
   },
   {
+    id: 1002,
     name: "Grace Okoro",
     class: "JSS1",
     result: "92%",
+    age: 13,
     subjects: [
       { subject: "Science", test: 18, exam: 70, homework: 10, classwork: 14 }
     ]
   }
 ];
 
+// Generate automatic student ID
+let lastStudentID = localStorage.getItem("lastStudentID") || 1000;
 
+function generateStudentID() {
+  lastStudentID++;
+  localStorage.setItem("lastStudentID", lastStudentID);
+  return lastStudentID;
+}
 // Display students in the table
 function displayStudents() {
   table.innerHTML = "";
+
   students.forEach((student, index) => {
+
     const row = document.createElement("tr");
+
     row.innerHTML = `
+        <td>${student.id}</td>
         <td>${student.name}</td>
         <td>${student.class}</td>
         <td>${student.result}</td>
         <td>${student.age}</td>
-        <td>${student.id}</td>
         <td>
             <a href="view.html?student=${encodeURIComponent(student.name)}" class="view">View</a>
-            <button class="remove" onclick="removeStudent(${index})">Suspend</button>        </td>
+            <button class="remove" onclick="removeStudent(${index})">Suspend</button>
+        </td>
     `;
+
     table.appendChild(row);
+
   });
 }
 
@@ -55,18 +72,30 @@ function saveStudents() {
 
 // Add a new student
 form.addEventListener("submit", function (e) {
+
   e.preventDefault();
+
   const name = document.getElementById("name").value;
   const studentClass = document.getElementById("class").value;
   const result = document.getElementById("result").value;
   const age = document.getElementById("age").value;
-  const id = document.getElementById("id").value;
-  
 
-  students.push({ name, class: studentClass, result, age });
+  const id = generateStudentID();
+
+  students.push({
+    id,
+    name,
+    class: studentClass,
+    result,
+    age,
+    subjects: []
+  });
+
   form.reset();
+
   saveStudents();
   displayStudents();
+
 });
 
 // Remove student
@@ -182,10 +211,10 @@ document.getElementById("addSubjectRowBtn").addEventListener("click", () => {
   const row = document.createElement("tr");
   row.innerHTML = `
     <td><input type="text" name="subject" required></td>
-    <td><input type="number" name="test" min="0" max="10" required></td>
-    <td><input type="number" name="exam" min="0" max="50" required></td>
-    <td><input type="number" name="homework" min="0" max="20" required></td>
-    <td><input type="number" name="classwork" min="0" max="20" required></td>
+    <td><input type="number" name="test" min="0" max="100" required></td>
+    <td><input type="number" name="exam" min="0" max="100" required></td>
+    <td><input type="number" name="homework" min="0" max="100" required></td>
+    <td><input type="number" name="classwork" min="0" max="100" required></td>
     <td><button type="button" onclick="this.closest('tr').remove()">Remove</button></td>
   `;
   uploadResultBody.appendChild(row);
