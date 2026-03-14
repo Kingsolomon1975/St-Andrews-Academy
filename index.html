@@ -70,6 +70,7 @@
                 <table>
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Name</th>
                             <th>Class</th>
                             <th>Result</th>
@@ -145,6 +146,197 @@
             </form>
             <thead>
                 <tr>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+
+            <label style="margin-top: 20px; display: block;"> 
+                <input type="checkbox" id="toggleParents" />
+               Show Parents
+            </label>
+
+            <div id="parentSection" style="display: none; margin-top: 10px;">
+                <h2>👪 Parent Information</h2>
+
+                <form id="parentForm" style="margin-bottom: 10px;">
+                    <input type="text" id="newParentName" placeholder="Parent Name" required />
+                    <input type="text" id="newParentPhone" placeholder="Phone" required />
+                    <input type="email" id="newParentEmail" placeholder="Email" required />
+                    <input type="text" id="newParentChild" placeholder="Child Name" required />
+                    <button type="submit">➕ Add Parent</button>
+                </form>
+
+                <table border="1" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Parent Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Child</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parentTable"></tbody>
+                </table>
+            </div>  
+        </div>
+        <div id="homePage" style="display: none; padding: 20px;">
+            <h2>Welcome, <span id="welcomeUser"></span>!</h2>
+            <p>Here’s a quick summary:</p>
+            <ul>
+                <li>Total Students: <span id="totalStudents">0</span></li>
+                <li>Suspended Students: <span id="totalSuspended">0</span></li>
+            </ul>
+
+            <div style="margin-top: 20px;">
+                <button id="goStudents">📚 Students</button>
+                <button id="goUploadResults">⬆️ Upload Results</button>
+                <button id="goStaffParents">👨‍🏫 Staff & Parents</button>
+                <button onclick="logout()">🚪 Logout</button>
+        </div>
+        <div id="classPage" style="display: none; padding: 20px;">
+            <h2>Select a Class</h2>
+            <div id="classButtons" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;"></div>
+
+            <div id="classStudentList" style="margin-top: 20px;">
+                <h3 id="classTitle"></h3>
+                <ul id="studentsInClass"></ul>
+            </div>
+        </div>
+        <div id="printSection" style="display:none">
+            <h2>Print Student Result</h2>
+            <input type="text" id="printSearch" placeholder="Enter student name..." style="padding: 8px; width: 300px;">
+            <select id="termSelect" style="padding: 8px; margin-left: 10px;">
+                <option value="Term 1">Term 1</option>
+                <option value="Term 2">Term 2</option>
+                <option value="Term 3">Term 3</option>
+            </select>
+            <button onclick="printStudentResult()">Print Result</button>
+        </div>       
+    </main>
+
+  <footer>
+    <p>&copy; 2025 ST ANDREW'S ACADEMY</p>
+  </footer>
+
+  <script src="script.js">
+    let students = JSON.parse(localStorage.getItem("students")) || [
+    {
+        name: "John Doe",
+        class: "SS2",
+        result: "85%",
+        subjects: [
+          { subject: "Math", test: 15, exam: 60, homework: 10, classwork: 15 },
+          { subject: "English", test: 14, exam: 55, homework: 9, classwork: 13 }
+        ]
+      }
+    ];
+  </script>
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  orderBy, 
+  limit 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAUT2RJ-8-5uk_K6xJZ_r2GAclm6liCe9U",
+  authDomain: "school-portal-92a23.firebaseapp.com",
+  projectId: "school-portal-92a23",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const studentForm = document.getElementById("student-form");
+const table = document.getElementById("student-table");
+
+
+// 🔹 Generate automatic student ID
+async function generateStudentID(){
+
+  const q = query(collection(db,"students"), orderBy("id","desc"), limit(1));
+  const snapshot = await getDocs(q);
+
+  if(snapshot.empty){
+    return 1001;
+  }
+
+  const lastStudent = snapshot.docs[0].data();
+  return lastStudent.id + 1;
+}
+
+
+// 🔹 Add student
+studentForm.addEventListener("submit", async (e)=>{
+
+  e.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const studentClass = document.getElementById("studentClass").value;
+  const result = document.getElementById("result").value;
+  const age = document.getElementById("age").value;
+
+  const studentID = await generateStudentID();
+
+  const studentData = {
+    id: studentID,
+    name: name,
+    class: studentClass,
+    result: result,
+    age: age
+  };
+
+  await addDoc(collection(db,"students"), studentData);
+
+  addStudentToTable(studentData);
+
+  studentForm.reset();
+
+});
+
+
+// 🔹 Display student
+function addStudentToTable(student){
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td>${student.id}</td>
+    <td>${student.name}</td>
+    <td>${student.class}</td>
+    <td>${student.result}</td>
+    <td>${student.age}</td>
+    <td><button onclick="deleteStudent(this)">Delete</button></td>
+  `;
+
+  table.appendChild(row);
+
+}
+
+
+// 🔹 Load all students
+async function loadStudents(){
+
+  const snapshot = await getDocs(collection(db,"students"));
+
+  snapshot.forEach((doc)=>{
+    addStudentToTable(doc.data());
+  });
+
+}
+
+loadStudents();
+
+</script>
+</body>
+</html>
+
                     <th>Edit</th>
                 </tr>
             </thead>
