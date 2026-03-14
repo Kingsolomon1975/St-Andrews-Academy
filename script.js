@@ -39,6 +39,7 @@ function displayStudents() {
         <td>${student.class}</td>
         <td>${student.result}</td>
         <td>${student.age}</td>
+        <td>${student.id}</td>
         <td>
             <a href="view.html?student=${encodeURIComponent(student.name)}" class="view">View</a>
             <button class="remove" onclick="removeStudent(${index})">Suspend</button>        </td>
@@ -59,6 +60,8 @@ form.addEventListener("submit", function (e) {
   const studentClass = document.getElementById("class").value;
   const result = document.getElementById("result").value;
   const age = document.getElementById("age").value;
+  const id = document.getElementById("id").value;
+  
 
   students.push({ name, class: studentClass, result, age });
   form.reset();
@@ -179,10 +182,10 @@ document.getElementById("addSubjectRowBtn").addEventListener("click", () => {
   const row = document.createElement("tr");
   row.innerHTML = `
     <td><input type="text" name="subject" required></td>
-    <td><input type="number" name="test" min="0" max="100" required></td>
-    <td><input type="number" name="exam" min="0" max="100" required></td>
-    <td><input type="number" name="homework" min="0" max="100" required></td>
-    <td><input type="number" name="classwork" min="0" max="100" required></td>
+    <td><input type="number" name="test" min="0" max="10" required></td>
+    <td><input type="number" name="exam" min="0" max="50" required></td>
+    <td><input type="number" name="homework" min="0" max="20" required></td>
+    <td><input type="number" name="classwork" min="0" max="20" required></td>
     <td><button type="button" onclick="this.closest('tr').remove()">Remove</button></td>
   `;
   uploadResultBody.appendChild(row);
