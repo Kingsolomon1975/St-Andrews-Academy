@@ -281,15 +281,16 @@ studentForm.addEventListener("submit", async (e)=>{
   const studentClass = document.getElementById("studentClass").value;
   const result = document.getElementById("result").value;
   const age = document.getElementById("age").value;
+  const id = document.getElementById("id").value;
 
   const studentID = await generateStudentID();
 
   const studentData = {
-    id: studentID,
     name: name,
     class: studentClass,
     result: result,
-    age: age
+    age: age,
+    id: studentID,
   };
 
   await addDoc(collection(db,"students"), studentData);
@@ -307,11 +308,12 @@ function addStudentToTable(student){
   const row = document.createElement("tr");
 
   row.innerHTML = `
-    <td>${student.id}</td>
+    
     <td>${student.name}</td>
     <td>${student.class}</td>
     <td>${student.result}</td>
     <td>${student.age}</td>
+    <td>${student.id}</td>
     <td><button onclick="deleteStudent(this)">Delete</button></td>
   `;
 
